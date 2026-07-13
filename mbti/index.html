@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>人格分享</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root{
+    --purple:#7c5cff; --purple-deep:#5b3fd6; --ink:#2b2350; --soft:#8b84b5;
+    --line:#ececf5;
+  }
+  html,body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#e7e0ff; color:var(--ink); -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .phone{
+    max-width:420px; margin:0 auto; min-height:100vh; position:relative;
+    background:#efe9ff; overflow:hidden;
+  }
+
+  /* ============ 通用视图切换 ============ */
+  .view{ display:none; min-height:100vh; }
+  .view.active{ display:block; }
+
+  /* ============ 视图1：结果页 ============ */
+  #viewResult{ background:linear-gradient(180deg,#b79dfb,#c9b8ff); }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; color:#fff;
+  }
+  .nav .title{ font-size:16px; font-weight:700; }
+  .nav .back,.nav .act{ font-size:22px; cursor:pointer; width:32px; height:32px;
+    display:grid; place-items:center; }
+  .act-share{
+    background:rgba(255,255,255,.25); border-radius:10px; font-size:18px;
+    border:1px solid rgba(255,255,255,.5);
+  }
+  .act-share:active{ transform:scale(.92); }
+
+  .poster-wrap{ padding:6px 14px 30px; }
+  .poster{
+    width:100%; display:block; border-radius:22px;
+    box-shadow:0 16px 40px -12px rgba(60,40,140,.45);
+    background:#fff;
+  }
+  /* 图片缺失时的占位提示 */
+  .poster.missing{
+    aspect-ratio:9/16; display:grid; place-items:center; text-align:center;
+    color:var(--soft); font-size:13px; line-height:1.9; padding:24px;
+    border:2px dashed #c9bdf5;
+  }
+  .hint-file{ color:var(--purple-deep); font-weight:800; }
+
+  /* ===== 内嵌渲染的结果海报 ===== */
+  .card-poster{ padding:20px 18px 22px; }
+  .cp-name{ display:flex; align-items:center; gap:6px; font-size:13px; color:var(--soft); font-weight:600; margin-bottom:8px; }
+  .cp-badge{ width:20px; height:20px; border-radius:6px; background:linear-gradient(100deg,#7b5cff,#4aa6ff); color:#fff; display:grid; place-items:center; font-size:11px; font-weight:800; }
+  .cp-head{ display:flex; align-items:flex-end; gap:10px; }
+  .cp-code{ font-size:46px; line-height:.9; font-weight:900; background:linear-gradient(100deg,#7b5cff,#4aa6ff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .cp-cn{ font-size:20px; font-weight:800; color:var(--ink); padding-bottom:3px; }
+  .cp-tags{ display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 4px; }
+  .cp-tags span{ background:#f1ecff; color:var(--purple-deep); font-size:11px; font-weight:700; padding:5px 11px; border-radius:999px; }
+  .cp-quote{ margin:14px 0; padding:12px 14px; background:linear-gradient(120deg,#f4efff,#ecf4ff); border-radius:14px; font-size:14px; font-weight:700; color:var(--purple-deep); text-align:center; }
+  .cp-hero{ display:grid; grid-template-columns:1fr 1fr; gap:6px; align-items:center; margin:4px 0; }
+  .cp-fox svg{ width:130px; height:130px; display:block; margin:0 auto; }
+  .cp-dims{ display:flex; flex-direction:column; gap:12px; }
+  .cp-dt{ display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--soft); font-weight:700; margin-bottom:4px; }
+  .cp-dt b{ color:var(--purple); font-size:12px; font-weight:900; }
+  .cp-track{ height:6px; border-radius:999px; background:#eee7ff; overflow:hidden; }
+  .cp-track i{ display:block; height:100%; border-radius:999px; background:linear-gradient(100deg,#7b5cff,#4aa6ff); }
+  .cp-desc-t{ font-size:15px; font-weight:800; color:var(--ink); text-align:center; margin:16px 0 8px; }
+  .cp-desc{ font-size:12px; line-height:1.8; color:var(--soft); }
+
+  /* 缩略图里的迷你海报 */
+  .thumb .mini{ transform:scale(.28); transform-origin:top left; width:357%; }
+
+  /* 上传按钮 */
+  .upload-bar{ display:flex; gap:10px; justify-content:center; margin-top:16px; }
+  .up-btn{ display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.9); color:var(--purple-deep); font-size:13px; font-weight:700; padding:10px 18px; border-radius:999px; cursor:pointer; box-shadow:0 6px 16px -6px rgba(60,40,140,.4); }
+  .up-btn:active{ transform:scale(.96); }
+  .up-reset{ background:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.7); color:#fff; font-size:13px; font-weight:700; padding:10px 16px; border-radius:999px; cursor:pointer; }
+  .up-tip{ text-align:center; font-size:12px; color:rgba(255,255,255,.85); margin-top:10px; }
+  .poster-wrap .poster{ cursor:pointer; }
+  .poster-wrap.drag{ outline:3px dashed #fff; outline-offset:6px; border-radius:26px; }
+
+  /* ============ 遮罩 + 底部分享面板 ============ */
+  .mask{
+    position:fixed; inset:0; background:rgba(20,10,50,.45);
+    opacity:0; visibility:hidden; transition:.25s; z-index:20;
+  }
+  .mask.show{ opacity:1; visibility:visible; }
+
+  .sheet{
+    position:fixed; left:50%; bottom:0; transform:translate(-50%,100%);
+    width:100%; max-width:420px; background:#fff;
+    border-radius:22px 22px 0 0; z-index:30; transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    padding:18px 0 calc(14px + env(safe-area-inset-bottom));
+  }
+  .sheet.show{ transform:translate(-50%,0); }
+  .sheet-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 20px 14px; font-size:15px; font-weight:700; color:var(--ink);
+  }
+  .sheet-head .x{ font-size:20px; color:var(--soft); cursor:pointer; }
+
+  .plat-row{
+    display:flex; gap:6px; overflow-x:auto; padding:6px 16px 16px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .plat{ flex:0 0 auto; width:66px; text-align:center; cursor:pointer; }
+  .plat:active{ transform:scale(.94); }
+  .plat .ic{
+    width:50px; height:50px; margin:0 auto 6px; border-radius:50%;
+    display:grid; place-items:center; font-size:24px; color:#fff;
+  }
+  .plat .nm{ font-size:11px; color:var(--soft); }
+
+  .divider{ height:8px; background:#f4f2fb; margin:2px 0 8px; }
+
+  .tool-row{ display:flex; padding:2px 16px 14px; }
+  .tool{ flex:1; text-align:center; cursor:pointer; }
+  .tool:active{ transform:scale(.95); }
+  .tool .ic{ width:50px; height:50px; margin:0 auto 6px; border-radius:50%;
+    background:#f1ecff; display:grid; place-items:center; font-size:22px; }
+  .tool .nm{ font-size:11px; color:var(--soft); }
+
+  .rate{
+    margin:2px 16px 0; padding:12px 14px; background:#faf8ff; border-radius:14px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .rate .lbl{ font-size:12px; color:var(--soft); }
+  .stars{ font-size:18px; letter-spacing:2px; cursor:pointer; }
+  .stars span{ color:#e0d8f5; }
+  .stars span.on{ color:#ffb02e; }
+
+  /* ============ 视图2：发布页 ============ */
+  #viewPublish{ background:#fff; }
+  .pub-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; border-bottom:1px solid var(--line);
+  }
+  .pub-nav .back{ font-size:22px; cursor:pointer; }
+  .pub-nav .tab{ font-size:16px; font-weight:800; }
+  .pub-nav .pub-btn{
+    background:linear-gradient(100deg,#7b5cff,#4aa6ff); color:#fff;
+    font-size:14px; font-weight:700; padding:7px 18px; border-radius:999px;
+    border:none; cursor:pointer;
+  }
+  .pub-btn:disabled{ opacity:.45; }
+  .pub-btn:active{ transform:scale(.96); }
+
+  .pub-body{ padding:18px 16px 86px; }
+
+  /* 字数统计 */
+  .counter{ text-align:right; font-size:12px; color:#c3bcdd; margin-top:2px; }
+
+  /* 已插入素材 */
+  .inserted{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .ins-chip{ display:inline-flex; align-items:center; gap:6px; background:#f1ecff;
+    color:var(--purple-deep); font-size:13px; font-weight:700; padding:8px 12px;
+    border-radius:10px; border:1px solid #e3d8ff; }
+  .ins-chip .rm{ color:var(--soft); cursor:pointer; font-weight:400; }
+
+  /* 关联卡片 */
+  .ref-card{ display:flex; align-items:center; gap:12px; margin:16px 0; padding:10px;
+    background:#f7f6fb; border:1px solid #ececf5; border-radius:12px; position:relative; }
+  .ref-thumb{ flex:0 0 auto; width:50px; height:50px; border-radius:12px;
+    background:linear-gradient(150deg,#ffd23f,#ff8a3d);
+    display:grid; grid-template-columns:1fr 1fr; place-items:center;
+    color:#fff; font-weight:900; font-size:16px; line-height:1; letter-spacing:0; padding:6px; }
+  .ref-thumb b{ display:grid; place-items:center; }
+  .ref-body{ flex:1; min-width:0; }
+  .ref-title{ width:100%; border:none; outline:none; background:#3c3654; color:#fff;
+    font-size:14px; font-weight:600; padding:7px 10px; border-radius:6px; }
+  .ref-title::placeholder{ color:rgba(255,255,255,.65); }
+  .ref-sub{ font-size:12px; color:var(--soft); margin-top:6px; padding-left:2px; }
+  .ref-close{ flex:0 0 auto; align-self:flex-start; width:22px; height:22px; border-radius:50%;
+    display:grid; place-items:center; color:var(--soft); font-size:16px; cursor:pointer; }
+  .ref-close:active{ transform:scale(.9); }
+
+  /* 底部工具栏 */
+  .pub-toolbar{
+    position:fixed; left:50%; bottom:0; transform:translateX(-50%);
+    width:100%; max-width:420px; background:#fff; border-top:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-around;
+    padding:12px 8px calc(12px + env(safe-area-inset-bottom)); z-index:15;
+  }
+  .tb-icon{ position:relative; font-size:22px; width:44px; height:40px;
+    display:grid; place-items:center; cursor:pointer; color:#4a4470; }
+  .tb-icon:active{ transform:scale(.9); }
+  .tb-new{ color:var(--purple); }
+  .tb-dot{ position:absolute; top:4px; right:6px; width:8px; height:8px;
+    background:#ff4d6d; border-radius:50%; border:1.5px solid #fff; }
+
+  /* 工具面板网格 */
+  .tool-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px 4px; padding:8px 16px 8px; }
+  .tg-item{ text-align:center; cursor:pointer; }
+  .tg-item:active{ transform:scale(.94); }
+  .tg-ic{ width:52px; height:52px; margin:0 auto 6px; border-radius:16px;
+    display:grid; place-items:center; font-size:26px; color:#fff; font-weight:800; }
+  .tg-nm{ font-size:12px; color:var(--ink); }
+  .thumbs{ display:flex; gap:10px; margin-bottom:16px; }
+  .thumb{
+    width:88px; height:120px; border-radius:12px; overflow:hidden;
+    background:#f1ecff; position:relative;
+  }
+  .thumb img{ width:100%; height:100%; object-fit:cover; }
+  .thumb.missing{ display:grid; place-items:center; font-size:11px; color:var(--soft);
+    text-align:center; padding:6px; border:1px dashed #cbbdf5; }
+  .thumb .del{ position:absolute; top:4px; right:4px; width:18px; height:18px;
+    border-radius:50%; background:rgba(0,0,0,.5); color:#fff; font-size:12px;
+    display:grid; place-items:center; cursor:pointer; }
+  .add-thumb{
+    width:88px; height:120px; border-radius:12px; border:1px dashed #cbbdf5;
+    display:grid; place-items:center; font-size:30px; color:#c3b6ee; cursor:pointer;
+  }
+
+  .field-title{
+    width:100%; border:none; outline:none; font-size:18px; font-weight:800;
+    color:var(--ink); padding:6px 0; margin-bottom:6px;
+  }
+  .field-body{
+    width:100%; border:none; outline:none; font-size:14px; line-height:1.8;
+    color:var(--ink); resize:none; min-height:90px;
+  }
+  .field-body::placeholder,.field-title::placeholder{ color:#bfb8dc; }
+
+  /* 标题灵感 */
+  .title-ideas{ margin:6px 0 14px; }
+  .ti-label{ font-size:12px; color:var(--soft); font-weight:700; margin-bottom:8px; }
+  .ti-list{ display:flex; flex-direction:column; gap:8px; }
+  .ti-item{ font-size:13px; color:var(--ink); background:#f6f4fc; border:1px solid transparent;
+    border-radius:10px; padding:10px 12px; cursor:pointer; line-height:1.4; transition:.15s; }
+  .ti-item.active{ background:#f1ecff; border-color:var(--purple); color:var(--purple-deep); font-weight:700; }
+  .ti-item:active{ transform:scale(.99); }
+
+  .topics{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  .topic{
+    background:#f1ecff; color:var(--purple-deep); font-size:13px; font-weight:700;
+    padding:6px 12px; border-radius:999px; cursor:pointer;
+  }
+  .topic .h{ color:var(--purple); margin-right:2px; }
+  .topic.add{ background:#fff; border:1px dashed #c9bdf5; color:var(--soft); }
+
+  .pub-opts{ border-top:1px solid var(--line); margin-top:10px; }
+  .opt{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 2px; border-bottom:1px solid var(--line); font-size:14px;
+    cursor:pointer;
+  }
+  .opt .l{ display:flex; align-items:center; gap:8px; }
+  .opt .r{ color:var(--soft); font-size:13px; }
+
+  /* toast */
+  .toast{
+    position:fixed; left:50%; top:42%; transform:translate(-50%,-50%) scale(.9);
+    background:rgba(30,20,60,.92); color:#fff; font-size:14px; font-weight:600;
+    padding:14px 22px; border-radius:14px; z-index:50; opacity:0; visibility:hidden;
+    transition:.2s; pointer-events:none; max-width:80%; text-align:center;
+  }
+  .toast.show{ opacity:1; visibility:visible; transform:translate(-50%,-50%) scale(1); }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ======= 视图1：结果页 ======= -->
+  <section id="viewResult" class="view active">
+    <div class="nav">
+      <div class="back" onclick="toast('返回上一页')">‹</div>
+      <div class="title">测测人格</div>
+      <div class="act act-share" onclick="openSheet()">↗</div>
+    </div>
+    <div class="poster-wrap" id="posterWrap">
+      <!-- 上传的真图（默认隐藏，选图后显示） -->
+      <img id="posterImg" class="poster" alt="我的结果图" style="display:none">
+      <!-- 结果海报：用代码渲染，内嵌进页面，无需外部图片 -->
+      <div class="poster card-poster" id="posterCard">
+        <div class="cp-name"><span class="cp-badge">M</span> 张mengx 的人格类型：</div>
+        <div class="cp-head">
+          <div class="cp-code">ENTP</div>
+          <div class="cp-cn">机敏赤狐</div>
+        </div>
+        <div class="cp-tags">
+          <span>拖延克星</span><span>反向思维</span><span>创造力 MAX</span>
+        </div>
+        <div class="cp-quote">说话的节奏由我掌控</div>
+        <div class="cp-hero">
+          <div class="cp-fox">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="182" rx="52" ry="9" fill="#000" opacity="0.06"/>
+              <path d="M150 120 Q195 90 175 55 Q170 100 135 110 Z" fill="#ff9a52"/>
+              <path d="M168 66 Q178 80 165 95 Q172 78 160 78 Z" fill="#fff"/>
+              <path d="M65 170 Q60 110 100 105 Q140 110 135 170 Z" fill="#ff8a3d"/>
+              <path d="M85 172 Q80 130 100 128 Q120 130 115 172 Z" fill="#fff"/>
+              <path d="M62 95 L48 55 Q75 68 100 66 Q125 68 152 55 L138 95 Q120 110 100 110 Q80 110 62 95 Z" fill="#ff8a3d"/>
+              <path d="M55 62 L48 55 L60 60 Z" fill="#ffb37a"/>
+              <path d="M145 62 L152 55 L140 60 Z" fill="#ffb37a"/>
+              <path d="M78 92 Q70 74 88 72 Q100 78 112 72 Q130 74 122 92 Q110 104 100 104 Q90 104 78 92 Z" fill="#fff"/>
+              <circle cx="85" cy="83" r="5" fill="#2b2350"/><circle cx="115" cy="83" r="5" fill="#2b2350"/>
+              <circle cx="86.5" cy="81.5" r="1.6" fill="#fff"/><circle cx="116.5" cy="81.5" r="1.6" fill="#fff"/>
+              <path d="M96 92 L104 92 L100 98 Z" fill="#2b2350"/>
+              <circle cx="74" cy="92" r="4" fill="#ffb3c8" opacity=".7"/><circle cx="126" cy="92" r="4" fill="#ffb3c8" opacity=".7"/>
+            </svg>
+          </div>
+          <div class="cp-dims">
+            <div class="cp-dim"><div class="cp-dt"><span>内向 I</span><b>E 外向 68%</b></div><div class="cp-track"><i style="width:68%"></i></div></div>
+            <div class="cp-dim"><div class="cp-dt"><span>实感 S</span><b>N 直觉 74%</b></div><div class="cp-track"><i style="width:74%"></i></div></div>
+            <div class="cp-dim"><div class="cp-dt"><span>情感 F</span><b>T 思维 61%</b></div><div class="cp-track"><i style="width:61%"></i></div></div>
+            <div class="cp-dim"><div class="cp-dt"><span>判断 J</span><b>P 知觉 57%</b></div><div class="cp-track"><i style="width:57%"></i></div></div>
+          </div>
+        </div>
+        <div class="cp-desc-t">思维敏捷且充满创造力的探索者</div>
+        <div class="cp-desc">是生活中的「发明家」。脑子里总有停不下来的点子，喜欢辩论、拆解问题，对一切既定规则都想问一句「为什么」，是团队里最会抛脑洞的那一个。</div>
+      </div>
+      <div class="upload-bar">
+        <label class="up-btn">📷 换成我的真图
+          <input type="file" accept="image/*" id="fileInput" hidden>
+        </label>
+        <button class="up-reset" id="resetBtn" style="display:none" onclick="resetPoster()">恢复默认图</button>
+      </div>
+      <div class="up-tip">点海报 或 把图拖进来，即可换成你的图</div>
+    </div>
+  </section>
+
+  <!-- ======= 视图2：发布页 ======= -->
+  <section id="viewPublish" class="view">
+    <div class="pub-nav">
+      <div class="back" onclick="showView('viewResult')">‹</div>
+      <div class="tab">图文</div>
+      <button class="pub-btn" id="doPublish" onclick="publish()">发布</button>
+    </div>
+    <div class="pub-body">
+      <div class="thumbs">
+        <div class="thumb" id="pubThumb" style="background:linear-gradient(160deg,#efe9ff,#e3f0ff);display:grid;place-items:center;">
+          <div style="text-align:center;line-height:1.2;">
+            <div style="font-size:26px;font-weight:900;background:linear-gradient(100deg,#7b5cff,#4aa6ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">ENTP</div>
+            <div style="font-size:12px;font-weight:800;color:#2b2350;margin-top:2px;">机敏赤狐</div>
+            <div style="font-size:30px;margin-top:6px;">🦊</div>
+          </div>
+          <div class="del" onclick="this.parentNode.style.display='none'">×</div>
+        </div>
+        <div class="add-thumb" onclick="toast('选择图片（原型占位）')">＋</div>
+      </div>
+
+      <input class="field-title" id="pubTitle" value="我的人格类型是 ENTP·机敏赤狐 🦊" placeholder="填写标题会有更多赞哦～">
+
+      <div class="title-ideas">
+        <div class="ti-label">🎲 换个标题（点击替换）</div>
+        <div class="ti-list" id="titleIdeas">
+          <div class="ti-item active">我的人格类型是 ENTP·机敏赤狐 🦊</div>
+          <div class="ti-item">ENTP·机敏赤狐上线🦊 说话的节奏由我掌控</div>
+          <div class="ti-item">测出来我是 ENTP，果然是个爱抬杠的辩论家 😎</div>
+          <div class="ti-item">叛逆厌蠢 + 创造力 MAX，这也太 ENTP 了吧</div>
+          <div class="ti-item">谁懂 ENTP 的脑洞有多野🦊 你又是哪只小动物？</div>
+        </div>
+      </div>
+      <textarea class="field-body" id="pubBody" maxlength="1000" placeholder="说说你的看法～" oninput="updateCount()">@测测小智 思维敏捷且充满创造力的探索者，是生活中的发明家</textarea>
+      <div class="counter"><span id="charCount">0</span>/1000</div>
+
+      <!-- 已插入的卡片/素材 -->
+      <div class="inserted" id="inserted"></div>
+
+      <!-- 关联卡片（替换原工具板块的样式） -->
+      <div class="ref-card" id="refCard">
+        <div class="ref-thumb"><b>E</b><b>N</b><b>T</b><b>P</b></div>
+        <div class="ref-body">
+          <input class="ref-title" placeholder="xxxxxxxxxxxxxxxxxxxxxx">
+          <div class="ref-sub">Stella Jang</div>
+        </div>
+        <div class="ref-close" onclick="document.getElementById('refCard').style.display='none'">×</div>
+      </div>
+
+      <div class="topics">
+        <span class="topic"><span class="h">#</span>MBTI小组</span>
+        <span class="topic"><span class="h">#</span>ENTP人格</span>
+        <span class="topic add" onclick="toast('添加话题（原型占位）')">＋ 话题</span>
+      </div>
+
+      <div class="pub-opts">
+        <div class="opt" onclick="toast('可见范围（原型占位）')">
+          <div class="l">🌐 公开可见</div>
+          <div class="r">所有人 ›</div>
+        </div>
+        <div class="opt" onclick="toast('位置（原型占位）')">
+          <div class="l">📍 你在哪里</div>
+          <div class="r">添加位置 ›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部工具栏 -->
+    <div class="pub-toolbar">
+      <div class="tb-icon" onclick="toast('添加图片（原型占位）')">🖼️</div>
+      <div class="tb-icon" onclick="toast('话题（原型占位）')">#</div>
+      <div class="tb-icon" onclick="toast('表情（原型占位）')">🙂</div>
+      <div class="tb-icon tb-new" onclick="openToolPanel()">🧰<span class="tb-dot"></span></div>
+      <div class="tb-icon" onclick="toast('更多（原型占位）')">⋯</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ======= 底部分享面板 ======= -->
+<div class="mask" id="mask" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-head"><span>分享至</span><span class="x" onclick="closeSheet()">×</span></div>
+
+  <div class="plat-row">
+    <div class="plat" onclick="goPublish()">
+      <div class="ic" style="background:linear-gradient(135deg,#8b6bff,#4aa6ff)">🔮</div>
+      <div class="nm">发布到社区</div>
+    </div>
+    <div class="plat" onclick="share('微信')">
+      <div class="ic" style="background:#07c160">💬</div><div class="nm">微信</div>
+    </div>
+    <div class="plat" onclick="share('朋友圈')">
+      <div class="ic" style="background:linear-gradient(135deg,#4aa6ff,#07c160)">👥</div><div class="nm">朋友圈</div>
+    </div>
+    <div class="plat" onclick="share('抖音')">
+      <div class="ic" style="background:#000">🎵</div><div class="nm">抖音</div>
+    </div>
+    <div class="plat" onclick="share('小红书')">
+      <div class="ic" style="background:#ff2442">📕</div><div class="nm">小红书</div>
+    </div>
+    <div class="plat" onclick="share('微博')">
+      <div class="ic" style="background:#e6162d">🌐</div><div class="nm">微博</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="tool-row">
+    <div class="tool" onclick="savePoster()">
+      <div class="ic">💾</div><div class="nm">保存图片</div>
+    </div>
+    <div class="tool" onclick="copyLink()">
+      <div class="ic">🔗</div><div class="nm">复制链接</div>
+    </div>
+    <div class="tool" onclick="toast('语音咨询（原型占位）')">
+      <div class="ic">🎧</div><div class="nm">语音咨询</div>
+    </div>
+  </div>
+
+  <div class="rate">
+    <span class="lbl">帮点赞并给人格类型评分</span>
+    <span class="stars" id="stars">
+      <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+    </span>
+  </div>
+</div>
+
+<!-- ======= 工具面板：插入卡片 / 素材 ======= -->
+<div class="mask" id="toolMask" onclick="closeToolPanel()"></div>
+<div class="sheet" id="toolSheet">
+  <div class="sheet-head"><span>插入卡片 / 素材</span><span class="x" onclick="closeToolPanel()">×</span></div>
+  <div class="tool-grid">
+    <div class="tg-item" onclick="insertCard('🦊 人格卡')">
+      <div class="tg-ic" style="background:linear-gradient(135deg,#8b6bff,#4aa6ff)">🦊</div>
+      <div class="tg-nm">人格卡</div>
+    </div>
+    <div class="tg-item" onclick="insertCard('💞 匹配度卡')">
+      <div class="tg-ic" style="background:linear-gradient(135deg,#ff6ba6,#ff9a52)">💞</div>
+      <div class="tg-nm">匹配度</div>
+    </div>
+    <div class="tg-item" onclick="insertCard('📊 投票')">
+      <div class="tg-ic" style="background:linear-gradient(135deg,#4aa6ff,#42d392)">📊</div>
+      <div class="tg-nm">投票</div>
+    </div>
+    <div class="tg-item" onclick="insertCard('🔗 接龙')">
+      <div class="tg-ic" style="background:linear-gradient(135deg,#ffb02e,#ff6ba6)">🔗</div>
+      <div class="tg-nm">接龙</div>
+    </div>
+    <div class="tg-item" onclick="insertCard('#话题标签')">
+      <div class="tg-ic" style="background:linear-gradient(135deg,#7c5cff,#b06bff)">#</div>
+      <div class="tg-nm">话题标签</div>
+    </div>
+    <div class="tg-item" onclick="insertCard('📍 打卡')">
+      <div class="tg-ic" style="background:linear-gradient(135deg,#42d392,#4aa6ff)">📍</div>
+      <div class="tg-nm">打卡</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ---- 视图切换 ---- */
+  function showView(id){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  /* ---- 上传/切换结果图 ---- */
+  var POSTER_KEY = 'mbti_poster_img';
+  var currentPoster = null;   // 当前使用的真图 dataURL
+
+  function applyPoster(dataUrl){
+    var img  = document.getElementById('posterImg');
+    var card = document.getElementById('posterCard');
+    var reset= document.getElementById('resetBtn');
+    currentPoster = dataUrl || null;
+    if(dataUrl){
+      img.src = dataUrl; img.style.display = 'block';
+      card.style.display = 'none';
+      reset.style.display = (dataUrl === 'result.jpg') ? 'none' : 'inline-block';
+    }else{
+      img.style.display = 'none'; img.removeAttribute('src');
+      card.style.display = 'block';
+      reset.style.display = 'none';
+    }
+    setThumb(dataUrl);
+  }
+
+  function setThumb(dataUrl){
+    var t = document.getElementById('pubThumb');
+    if(!t) return;
+    t.style.display = 'block';
+    if(dataUrl){
+      t.style.background = '#000';
+      t.innerHTML = '<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover">'+
+                    '<div class="del" onclick="this.parentNode.style.display=\'none\'">×</div>';
+    }
+  }
+
+  function resetPoster(){
+    applyPoster('result.jpg');
+    try{ localStorage.removeItem(POSTER_KEY); }catch(e){}
+    toast('已恢复默认图');
+  }
+
+  function loadImageFile(f){
+    if(!f || !/^image\//.test(f.type)){ toast('请选择图片文件'); return; }
+    var r = new FileReader();
+    r.onload = function(){
+      applyPoster(r.result);
+      try{ localStorage.setItem(POSTER_KEY, r.result); }catch(err){ /* 图太大存不下时忽略 */ }
+      toast('已换成你的结果图 🦊');
+    };
+    r.readAsDataURL(f);
+  }
+
+  document.getElementById('fileInput').addEventListener('change', function(e){
+    loadImageFile(e.target.files && e.target.files[0]);
+  });
+
+  /* 点海报直接选图 */
+  function pickPoster(){ document.getElementById('fileInput').click(); }
+  document.getElementById('posterImg').addEventListener('click', pickPoster);
+  document.getElementById('posterCard').addEventListener('click', pickPoster);
+
+  /* 把图片拖进来 */
+  (function(){
+    var pw = document.getElementById('posterWrap');
+    pw.addEventListener('dragover', function(e){ e.preventDefault(); pw.classList.add('drag'); });
+    pw.addEventListener('dragleave', function(e){ if(e.target===pw) pw.classList.remove('drag'); });
+    pw.addEventListener('drop', function(e){
+      e.preventDefault(); pw.classList.remove('drag');
+      loadImageFile(e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
+  })();
+
+  /* 打开页面时：优先用上传过的图，否则用同目录的 result.jpg 真图 */
+  (function(){
+    var saved = null;
+    try{ saved = localStorage.getItem(POSTER_KEY); }catch(e){}
+    applyPoster(saved || 'result.jpg');
+  })();
+
+  /* ---- 标题灵感：点击替换标题栏 ---- */
+  document.getElementById('titleIdeas').addEventListener('click', function(e){
+    var el = e.target.closest('.ti-item');
+    if(!el) return;
+    document.getElementById('pubTitle').value = el.textContent.trim();
+    this.querySelectorAll('.ti-item').forEach(function(x){ x.classList.remove('active'); });
+    el.classList.add('active');
+  });
+
+  /* ---- 分享面板 ---- */
+  function openSheet(){
+    document.getElementById('mask').classList.add('show');
+    document.getElementById('sheet').classList.add('show');
+  }
+  function closeSheet(){
+    document.getElementById('mask').classList.remove('show');
+    document.getElementById('sheet').classList.remove('show');
+  }
+
+  /* ---- 工具面板：插入卡片/素材 ---- */
+  function openToolPanel(){
+    document.getElementById('toolMask').classList.add('show');
+    document.getElementById('toolSheet').classList.add('show');
+  }
+  function closeToolPanel(){
+    document.getElementById('toolMask').classList.remove('show');
+    document.getElementById('toolSheet').classList.remove('show');
+  }
+  function insertCard(name){
+    closeToolPanel();
+    var box = document.getElementById('inserted');
+    var chip = document.createElement('span');
+    chip.className = 'ins-chip';
+    chip.innerHTML = name + ' <span class="rm">×</span>';
+    chip.querySelector('.rm').onclick = function(){ box.removeChild(chip); };
+    box.appendChild(chip);
+    toast('已插入「'+name+'」');
+  }
+
+  /* ---- 字数统计 ---- */
+  function updateCount(){
+    var v = document.getElementById('pubBody').value;
+    document.getElementById('charCount').textContent = v.length;
+  }
+
+  /* ---- 发布到社区 ---- */
+  function goPublish(){ closeSheet(); showView('viewPublish'); updateCount(); }
+  function publish(){
+    var title = document.getElementById('pubTitle').value.trim();
+    var body  = document.getElementById('pubBody').value.trim();
+    toast('发布成功 🎉' + (title? '：'+title : ''));
+    setTimeout(function(){ showView('viewResult'); }, 1200);
+  }
+
+  /* ---- 分享到平台（原型：尝试系统分享，否则提示）---- */
+  function share(name){
+    closeSheet();
+    if(navigator.share){
+      navigator.share({
+        title:'我的 MBTI 人格',
+        text:'我的 MBTI 居然是 ENTP，有什么说法吗？',
+        url:location.href
+      }).catch(function(){});
+    }else{
+      toast('分享到「'+name+'」（原型占位）');
+    }
+  }
+
+  /* ---- 保存图片：有真图就下载，否则给提示 ---- */
+  function savePoster(){
+    closeSheet();
+    if(currentPoster){
+      var a = document.createElement('a');
+      a.href = currentPoster; a.download = 'mbti-result.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      toast('已保存图片 💾');
+    }else{
+      toast('已保存到相册 💾（示例图为占位）');
+    }
+  }
+
+  /* ---- 复制链接 ---- */
+  function copyLink(){
+    closeSheet();
+    var url = location.href;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(url).then(function(){ toast('链接已复制 🔗'); },
+                                              function(){ toast(url); });
+    }else{ toast(url); }
+  }
+
+  /* ---- 评分 ---- */
+  document.getElementById('stars').addEventListener('click', function(e){
+    var v = e.target.getAttribute('data-v');
+    if(!v) return;
+    this.querySelectorAll('span').forEach(function(s){
+      s.classList.toggle('on', +s.getAttribute('data-v') <= +v);
+    });
+    toast('感谢你的 '+v+' 星评分！');
+  });
+
+  /* ---- 轻提示 ---- */
+  var toastTimer;
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1600);
+  }
+</script>
+</body>
+</html>
