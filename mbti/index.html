@@ -374,7 +374,7 @@
       <div class="tb-text">测测你的<b>人格类型</b></div>
       <div class="tb-faces">🦊🐨</div>
     </div>
-    <div class="q-progress"><span id="qNum">1</span> / 24
+    <div class="q-progress"><span id="qNum">1</span> / <span id="qTotal">1</span>
       <div class="q-bar"><i id="qBar"></i></div>
     </div>
     <div class="q-area">
@@ -816,30 +816,7 @@
 
   /* ---- 答题引擎 ---- */
   var QUESTIONS = [
-    {q:'你通常____？', a:'容易和大家打成一片', b:'独处的时候更多'},
-    {q:'做决定时你更看重____？', a:'事实和逻辑', b:'感受和他人'},
-    {q:'面对新计划你倾向____？', a:'先定好再行动', b:'边走边看'},
-    {q:'你更喜欢聊____？', a:'具体的事', b:'各种可能性'},
-    {q:'周末你更想____？', a:'出门社交', b:'宅家充电'},
-    {q:'遇到冲突你会____？', a:'直接讲道理', b:'先照顾情绪'},
-    {q:'你更相信____？', a:'亲眼所见', b:'直觉预感'},
-    {q:'你的桌面通常____？', a:'井井有条', b:'灵感四散'},
-    {q:'认识新朋友你____？', a:'主动搭话', b:'等对方先开口'},
-    {q:'你更享受____？', a:'完成清单', b:'保留弹性'},
-    {q:'学东西你喜欢____？', a:'按步骤来', b:'抓大方向'},
-    {q:'你更容易被____打动？', a:'有道理', b:'有温度'},
-    {q:'计划旅行你会____？', a:'排好行程', b:'随性出发'},
-    {q:'聚会结束后你感觉____？', a:'意犹未尽', b:'需要独处回血'},
-    {q:'你更关注____？', a:'当下细节', b:'未来趋势'},
-    {q:'给建议时你更倾向____？', a:'说真话', b:'顾及对方'},
-    {q:'任务临近截止你____？', a:'早早做完', b:'最后冲刺'},
-    {q:'你更愿意花时间在____？', a:'拓展人脉', b:'深交少数人'},
-    {q:'面对规则你通常____？', a:'先遵守', b:'想为什么'},
-    {q:'你记住的更多是____？', a:'发生了什么', b:'当时的感觉'},
-    {q:'做事你更喜欢____？', a:'有明确目标', b:'保持开放'},
-    {q:'表达观点你会____？', a:'直截了当', b:'委婉铺垫'},
-    {q:'你更喜欢的环境是____？', a:'热闹活跃', b:'安静专注'},
-    {q:'最后一题：你更想知道____？', a:'我擅长什么', b:'我是怎样的人'}
+    {q:'你通常____？', a:'容易和大家打成一片', b:'独处的时候更多'}
   ];
   var qIndex = 0;
   var qAnswers = new Array(QUESTIONS.length).fill(null);
@@ -847,6 +824,7 @@
   function renderQ(){
     var item = QUESTIONS[qIndex];
     document.getElementById('qNum').textContent = qIndex + 1;
+    document.getElementById('qTotal').textContent = QUESTIONS.length;
     document.getElementById('qBar').style.width = ((qIndex+1)/QUESTIONS.length*100) + '%';
     document.getElementById('qTitle').textContent = item.q;
     var opts = document.getElementById('qOpts');
