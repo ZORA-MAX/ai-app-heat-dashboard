@@ -54,6 +54,20 @@
 
   /* ============ 视图④：帖子详情 ============ */
   #viewPost{ background:#fff; min-height:100vh; padding-bottom:70px; }
+  #viewPost .pv-scroll{ padding-bottom:80px; }
+
+  /* 工具入口 CTA（固定在评论栏上方，游客始终可见） */
+  .pv-cta{ position:fixed; left:50%; bottom:60px; transform:translateX(-50%);
+    width:calc(100% - 24px); max-width:396px; z-index:14;
+    display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:14px;
+    background:linear-gradient(100deg,#7b5cff,#4aa6ff); color:#fff; cursor:pointer;
+    box-shadow:0 10px 24px -8px rgba(80,60,220,.55); }
+  .pv-cta:active{ transform:translateX(-50%) scale(.98); }
+  .pv-cta-ic{ font-size:24px; }
+  .pv-cta-txt{ flex:1; font-size:13px; font-weight:700; line-height:1.3; }
+  .pv-cta-txt b{ display:block; font-size:11px; font-weight:500; opacity:.9; }
+  .pv-cta-go{ flex:0 0 auto; background:rgba(255,255,255,.95); color:var(--purple-deep);
+    font-size:13px; font-weight:800; padding:7px 13px; border-radius:999px; }
   .pv-nav{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line); }
   .pv-nav .back{ font-size:22px; cursor:pointer; color:var(--ink); }
   .pv-author{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
@@ -290,11 +304,12 @@
   /* 标题灵感 */
   .title-ideas{ margin:6px 0 14px; }
   .ti-label{ font-size:12px; color:var(--soft); font-weight:700; margin-bottom:8px; }
-  .ti-list{ display:flex; flex-direction:column; gap:8px; }
-  .ti-item{ font-size:13px; color:var(--ink); background:#f6f4fc; border:1px solid transparent;
-    border-radius:10px; padding:10px 12px; cursor:pointer; line-height:1.4; transition:.15s; }
+  .ti-list{ display:flex; flex-direction:row; gap:8px; overflow-x:auto; padding-bottom:4px;
+    -webkit-overflow-scrolling:touch; }
+  .ti-item{ flex:0 0 auto; white-space:nowrap; font-size:13px; color:var(--ink); background:#f6f4fc;
+    border:1px solid transparent; border-radius:999px; padding:9px 14px; cursor:pointer; transition:.15s; }
   .ti-item.active{ background:#f1ecff; border-color:var(--purple); color:var(--purple-deep); font-weight:700; }
-  .ti-item:active{ transform:scale(.99); }
+  .ti-item:active{ transform:scale(.97); }
 
   .topics{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
   .topic{
@@ -514,7 +529,7 @@
       <div class="pv-author">
         <div class="pv-ava">EN</div>
         <div class="pv-who">
-          <div class="pv-name">温润阳光</div>
+          <div class="pv-name">张mengx</div>
           <div class="pv-utag">ENTP · 机敏赤狐</div>
         </div>
       </div>
@@ -540,6 +555,13 @@
       <div class="pv-meta">2025-10-29 · 黑龙江省</div>
     </div>
 
+    <!-- 工具入口（游客点击进入测试页） -->
+    <div class="pv-cta" onclick="showView('viewTest')">
+      <span class="pv-cta-ic">🦊</span>
+      <span class="pv-cta-txt">测测你是什么人格类型？<b>2 分钟出结果</b></span>
+      <span class="pv-cta-go">免费测 →</span>
+    </div>
+
     <div class="pv-bar">
       <div class="pv-input">期待有你的评论…</div>
       <div class="pv-acts">
@@ -558,10 +580,6 @@
   <div class="sheet-head"><span>分享至</span><span class="x" onclick="closeSheet()">×</span></div>
 
   <div class="plat-row">
-    <div class="plat" onclick="goPublish()">
-      <div class="ic" style="background:linear-gradient(135deg,#8b6bff,#4aa6ff)">🔮</div>
-      <div class="nm">发布到社区</div>
-    </div>
     <div class="plat" onclick="share('微信')">
       <div class="ic" style="background:#07c160">💬</div><div class="nm">微信</div>
     </div>
@@ -582,6 +600,9 @@
   <div class="divider"></div>
 
   <div class="tool-row">
+    <div class="tool" onclick="goPublish()">
+      <div class="ic" style="background:linear-gradient(135deg,#8b6bff,#4aa6ff);color:#fff">🔮</div><div class="nm">发布到社区</div>
+    </div>
     <div class="tool" onclick="savePoster()">
       <div class="ic">💾</div><div class="nm">保存图片</div>
     </div>
