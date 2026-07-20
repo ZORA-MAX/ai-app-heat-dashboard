@@ -24,18 +24,65 @@
   .view{ display:none; min-height:100vh; }
   .view.active{ display:block; }
 
-  /* ============ 视图0：测评入口 ============ */
-  #viewTest{ background:linear-gradient(180deg,#b79dfb,#c9b8ff); }
-  .test-hero{ text-align:center; padding:30px 28px; color:#fff; }
-  .test-logo{ font-size:80px; margin:20px 0 10px; filter:drop-shadow(0 10px 16px rgba(60,40,140,.4)); }
-  .test-title{ font-size:30px; font-weight:900; letter-spacing:1px; margin-bottom:10px; }
-  .test-sub{ font-size:14px; opacity:.9; margin-bottom:6px; }
-  .test-meta{ font-size:12px; opacity:.75; margin-bottom:36px; }
-  .test-start{ width:100%; max-width:280px; padding:16px; border:none; border-radius:999px;
-    background:#fff; color:var(--purple-deep); font-size:17px; font-weight:900; cursor:pointer;
-    box-shadow:0 12px 28px -8px rgba(40,20,90,.5); }
-  .test-start:active{ transform:scale(.97); }
-  .test-tip{ font-size:13px; opacity:.85; margin-top:16px; }
+  /* ============ 视图⑤：答题页 ============ */
+  #viewTest{ background:linear-gradient(180deg,#dff1ff,#eef7ff 40%,#fff); min-height:100vh; }
+  #viewTest .nav{ color:#2b2350; }
+  .test-banner{ position:relative; margin:6px 16px 0; padding:26px 20px; border-radius:20px;
+    background:linear-gradient(120deg,#bfe4ff,#d9ecff); overflow:hidden; }
+  .tb-cloud{ position:absolute; top:10px; right:20px; font-size:26px; opacity:.9; }
+  .tb-text{ font-size:24px; font-weight:900; color:#2b6cb0; letter-spacing:1px; }
+  .tb-text b{ display:inline-block; margin-left:4px; color:#fff; background:#5aa9f0;
+    padding:2px 10px; border-radius:8px; }
+  .tb-faces{ font-size:34px; margin-top:10px; }
+  .q-progress{ margin:22px 20px 0; font-size:14px; font-weight:800; color:#2b6cb0; }
+  .q-bar{ height:6px; border-radius:999px; background:#e2edf7; margin-top:8px; overflow:hidden; }
+  .q-bar i{ display:block; height:100%; width:4%; border-radius:999px;
+    background:linear-gradient(90deg,#5aa9f0,#8b6bff); transition:width .3s; }
+  .q-area{ padding:26px 22px 10px; }
+  .q-title{ font-size:20px; font-weight:800; color:var(--ink); margin-bottom:22px; }
+  .q-opts{ display:flex; flex-direction:column; gap:14px; }
+  .q-opt{ padding:16px 18px; background:#fff; border:1.5px solid #e6eef7; border-radius:14px;
+    font-size:15px; color:var(--ink); cursor:pointer; box-shadow:0 4px 14px -8px rgba(40,80,140,.3); transition:.15s; }
+  .q-opt .k{ font-weight:900; color:#5aa9f0; margin-right:8px; }
+  .q-opt.sel{ border-color:#5aa9f0; background:#eef7ff; }
+  .q-opt:active{ transform:scale(.99); }
+  .q-nav{ display:flex; gap:12px; padding:16px 22px 30px; }
+  .q-btn{ flex:1; padding:14px; border-radius:999px; border:1.5px solid #d6e4f2;
+    background:#fff; color:#4a5a70; font-size:15px; font-weight:700; cursor:pointer; }
+  .q-btn:active{ transform:scale(.97); }
+  .q-btn-main{ border:none; background:linear-gradient(100deg,#5aa9f0,#8b6bff); color:#fff; }
+
+  /* ============ 视图④：帖子详情 ============ */
+  #viewPost{ background:#fff; min-height:100vh; padding-bottom:70px; }
+  .pv-nav{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line); }
+  .pv-nav .back{ font-size:22px; cursor:pointer; color:var(--ink); }
+  .pv-author{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+  .pv-ava{ width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#8b6bff,#4aa6ff);
+    color:#fff; font-size:13px; font-weight:800; display:grid; place-items:center; }
+  .pv-name{ font-size:14px; font-weight:800; color:var(--ink); }
+  .pv-utag{ font-size:11px; color:var(--soft); }
+  .pv-follow{ border:1.5px solid var(--purple); background:transparent; color:var(--purple);
+    font-size:13px; font-weight:700; padding:5px 14px; border-radius:999px; cursor:pointer; }
+  .pv-follow.on{ background:#f1ecff; border-color:#e0d6ff; color:var(--soft); }
+  .pv-scroll{ padding:16px; }
+  .pv-poster{ width:100%; display:block; border-radius:16px; box-shadow:0 10px 30px -12px rgba(60,40,140,.35); }
+  .pv-body{ font-size:15px; line-height:1.7; color:var(--ink); margin:16px 2px; }
+  .pv-testcard{ display:flex; align-items:center; gap:12px; padding:10px; background:#f7f6fb;
+    border:1px solid #ececf5; border-radius:12px; cursor:pointer; }
+  .pv-testcard:active{ transform:scale(.99); }
+  .pv-tc-title{ font-size:14px; font-weight:700; color:var(--ink); }
+  .pv-tc-go{ flex:0 0 auto; background:linear-gradient(100deg,#7b5cff,#4aa6ff); color:#fff;
+    font-size:12px; font-weight:800; padding:8px 14px; border-radius:999px; }
+  .pv-topic{ display:flex; gap:14px; margin:16px 2px 8px; }
+  .pv-topic span{ color:var(--purple-deep); font-size:13px; font-weight:700; }
+  .pv-meta{ font-size:12px; color:var(--soft); margin:0 2px; }
+  .pv-bar{ position:fixed; left:50%; bottom:0; transform:translateX(-50%); width:100%; max-width:420px;
+    background:#fff; border-top:1px solid var(--line); display:flex; align-items:center; gap:12px;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom)); }
+  .pv-input{ flex:1; background:#f4f2fb; border-radius:999px; padding:9px 16px; font-size:13px; color:var(--soft); }
+  .pv-acts{ display:flex; gap:14px; font-size:13px; color:var(--ink-soft); }
+  .pv-acts span{ cursor:pointer; }
+  .pv-acts b{ font-weight:700; }
 
   /* ============ 视图1：结果页 ============ */
   #viewResult{ background:linear-gradient(180deg,#b79dfb,#c9b8ff); }
@@ -300,25 +347,33 @@
 <body>
 <div class="phone">
 
-  <!-- ======= 视图0：工具测评入口 ======= -->
-  <section id="viewTest" class="view active">
+  <!-- ======= 视图⑤：十六人格答题页 ======= -->
+  <section id="viewTest" class="view">
     <div class="nav">
-      <div class="back" onclick="toast('返回上一页')">‹</div>
+      <div class="back" onclick="showView('viewResult')">‹</div>
       <div class="title">十六人格测试</div>
       <div style="width:32px"></div>
     </div>
-    <div class="test-hero">
-      <div class="test-logo">🦊</div>
-      <h1 class="test-title">16 型人格测试</h1>
-      <p class="test-sub">发现真实的自己 · 已有 1.2 亿人参与</p>
-      <div class="test-meta">共 48 题 · 约 3 分钟</div>
-      <button class="test-start" onclick="startTest()">开始测评</button>
-      <div class="test-tip">测完生成你的专属人格海报 🎉</div>
+    <div class="test-banner">
+      <div class="tb-cloud">☁️</div>
+      <div class="tb-text">测测你的<b>人格类型</b></div>
+      <div class="tb-faces">🦊🐨</div>
+    </div>
+    <div class="q-progress"><span id="qNum">1</span> / 24
+      <div class="q-bar"><i id="qBar"></i></div>
+    </div>
+    <div class="q-area">
+      <div class="q-title" id="qTitle">你通常____？</div>
+      <div class="q-opts" id="qOpts"></div>
+    </div>
+    <div class="q-nav">
+      <button class="q-btn" id="qPrev" onclick="prevQ()">← 上一题</button>
+      <button class="q-btn q-btn-main" id="qNext" onclick="nextQ()">下一题 →</button>
     </div>
   </section>
 
   <!-- ======= 视图1：结果页 ======= -->
-  <section id="viewResult" class="view">
+  <section id="viewResult" class="view active">
     <div class="nav">
       <div class="back" onclick="toast('返回上一页')">‹</div>
       <div class="title">测测人格</div>
@@ -452,6 +507,49 @@
     </div>
   </section>
 
+  <!-- ======= 视图④：已发布帖子详情页 ======= -->
+  <section id="viewPost" class="view">
+    <div class="pv-nav">
+      <div class="back" onclick="showView('viewResult')">‹</div>
+      <div class="pv-author">
+        <div class="pv-ava">EN</div>
+        <div class="pv-who">
+          <div class="pv-name">温润阳光</div>
+          <div class="pv-utag">ENTP · 机敏赤狐</div>
+        </div>
+      </div>
+      <button class="pv-follow" onclick="this.classList.toggle('on'); this.textContent=this.classList.contains('on')?'已关注':'关注'">关注</button>
+      <div class="act act-share" onclick="openSheet()" style="margin-left:8px">↗</div>
+    </div>
+
+    <div class="pv-scroll">
+      <img class="pv-poster" id="pvPoster" src="result.jpg" alt="人格海报">
+      <div class="pv-body">我的 MBTI 居然是 ENTP，有什么说法吗？🤔 感觉太准了……</div>
+
+      <!-- 关联测试卡片：点击进入测评（闭环入口） -->
+      <div class="pv-testcard" onclick="showView('viewTest')">
+        <div class="ref-thumb"><b>E</b><b>N</b><b>T</b><b>P</b></div>
+        <div class="ref-body">
+          <div class="pv-tc-title">十六人格测试 · 机敏赤狐</div>
+          <div class="ref-sub">1.2 亿人已测 · 点我也测一下 ›</div>
+        </div>
+        <div class="pv-tc-go">去测</div>
+      </div>
+
+      <div class="pv-topic"><span>@ MBTI 小组</span><span># ENTP人格</span></div>
+      <div class="pv-meta">2025-10-29 · 黑龙江省</div>
+    </div>
+
+    <div class="pv-bar">
+      <div class="pv-input">期待有你的评论…</div>
+      <div class="pv-acts">
+        <span onclick="likeToggle(this)">👍 <b>48</b></span>
+        <span>💬 3</span>
+        <span>⭐ 39</span>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <!-- ======= 底部分享面板 ======= -->
@@ -561,6 +659,7 @@
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0,0);
+    if(id==='viewTest') renderQ();
   }
 
   /* ---- 上传/切换结果图 ---- */
@@ -686,14 +785,77 @@
 
   /* ---- 发布到社区 ---- */
   function goPublish(){ closeSheet(); showView('viewPublish'); updateCount(); }
+  /* 发布 → 跳到已发布帖子详情页 */
   function publish(){
-    openSuccess();
+    var img = document.getElementById('pvPoster');
+    if(img) img.src = currentPoster || 'result.jpg';
+    toast('发布成功 🎉');
+    showView('viewPost');
   }
 
-  /* ---- 测评入口：开始测评 → 生成海报 ---- */
-  function startTest(){
-    toast('测评中，生成你的人格海报…');
+  /* ---- 答题引擎 ---- */
+  var QUESTIONS = [
+    {q:'你通常____？', a:'容易和大家打成一片', b:'独处的时候更多'},
+    {q:'做决定时你更看重____？', a:'事实和逻辑', b:'感受和他人'},
+    {q:'面对新计划你倾向____？', a:'先定好再行动', b:'边走边看'},
+    {q:'你更喜欢聊____？', a:'具体的事', b:'各种可能性'},
+    {q:'周末你更想____？', a:'出门社交', b:'宅家充电'},
+    {q:'遇到冲突你会____？', a:'直接讲道理', b:'先照顾情绪'},
+    {q:'你更相信____？', a:'亲眼所见', b:'直觉预感'},
+    {q:'你的桌面通常____？', a:'井井有条', b:'灵感四散'},
+    {q:'认识新朋友你____？', a:'主动搭话', b:'等对方先开口'},
+    {q:'你更享受____？', a:'完成清单', b:'保留弹性'},
+    {q:'学东西你喜欢____？', a:'按步骤来', b:'抓大方向'},
+    {q:'你更容易被____打动？', a:'有道理', b:'有温度'},
+    {q:'计划旅行你会____？', a:'排好行程', b:'随性出发'},
+    {q:'聚会结束后你感觉____？', a:'意犹未尽', b:'需要独处回血'},
+    {q:'你更关注____？', a:'当下细节', b:'未来趋势'},
+    {q:'给建议时你更倾向____？', a:'说真话', b:'顾及对方'},
+    {q:'任务临近截止你____？', a:'早早做完', b:'最后冲刺'},
+    {q:'你更愿意花时间在____？', a:'拓展人脉', b:'深交少数人'},
+    {q:'面对规则你通常____？', a:'先遵守', b:'想为什么'},
+    {q:'你记住的更多是____？', a:'发生了什么', b:'当时的感觉'},
+    {q:'做事你更喜欢____？', a:'有明确目标', b:'保持开放'},
+    {q:'表达观点你会____？', a:'直截了当', b:'委婉铺垫'},
+    {q:'你更喜欢的环境是____？', a:'热闹活跃', b:'安静专注'},
+    {q:'最后一题：你更想知道____？', a:'我擅长什么', b:'我是怎样的人'}
+  ];
+  var qIndex = 0;
+  var qAnswers = new Array(QUESTIONS.length).fill(null);
+
+  function renderQ(){
+    var item = QUESTIONS[qIndex];
+    document.getElementById('qNum').textContent = qIndex + 1;
+    document.getElementById('qBar').style.width = ((qIndex+1)/QUESTIONS.length*100) + '%';
+    document.getElementById('qTitle').textContent = item.q;
+    var opts = document.getElementById('qOpts');
+    opts.innerHTML = '';
+    [['A',item.a],['B',item.b]].forEach(function(o){
+      var d = document.createElement('div');
+      d.className = 'q-opt' + (qAnswers[qIndex]===o[0] ? ' sel' : '');
+      d.innerHTML = '<span class="k">'+o[0]+'</span>'+o[1];
+      d.onclick = function(){ qAnswers[qIndex]=o[0]; renderQ(); setTimeout(nextQ, 220); };
+      opts.appendChild(d);
+    });
+    document.getElementById('qPrev').style.visibility = qIndex===0 ? 'hidden' : 'visible';
+    document.getElementById('qNext').textContent = (qIndex===QUESTIONS.length-1) ? '查看结果 →' : '下一题 →';
+  }
+  function prevQ(){ if(qIndex>0){ qIndex--; renderQ(); } }
+  function nextQ(){
+    if(qIndex < QUESTIONS.length-1){ qIndex++; renderQ(); }
+    else finishTest();
+  }
+  function finishTest(){
+    toast('测评完成，生成你的人格海报…');
+    qIndex = 0; qAnswers = new Array(QUESTIONS.length).fill(null);
     setTimeout(function(){ showView('viewResult'); }, 900);
+  }
+
+  /* 帖子点赞 */
+  function likeToggle(el){
+    var b = el.querySelector('b'); var n = parseInt(b.textContent,10);
+    if(el.classList.toggle('liked')){ b.textContent = n+1; el.style.color='#ff4d6d'; }
+    else { b.textContent = n-1; el.style.color=''; }
   }
 
   /* ---- 发帖成功面板（闭环） ---- */
