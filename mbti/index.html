@@ -24,6 +24,19 @@
   .view{ display:none; min-height:100vh; }
   .view.active{ display:block; }
 
+  /* ============ 视图0：测评入口 ============ */
+  #viewTest{ background:linear-gradient(180deg,#b79dfb,#c9b8ff); }
+  .test-hero{ text-align:center; padding:30px 28px; color:#fff; }
+  .test-logo{ font-size:80px; margin:20px 0 10px; filter:drop-shadow(0 10px 16px rgba(60,40,140,.4)); }
+  .test-title{ font-size:30px; font-weight:900; letter-spacing:1px; margin-bottom:10px; }
+  .test-sub{ font-size:14px; opacity:.9; margin-bottom:6px; }
+  .test-meta{ font-size:12px; opacity:.75; margin-bottom:36px; }
+  .test-start{ width:100%; max-width:280px; padding:16px; border:none; border-radius:999px;
+    background:#fff; color:var(--purple-deep); font-size:17px; font-weight:900; cursor:pointer;
+    box-shadow:0 12px 28px -8px rgba(40,20,90,.5); }
+  .test-start:active{ transform:scale(.97); }
+  .test-tip{ font-size:13px; opacity:.85; margin-top:16px; }
+
   /* ============ 视图1：结果页 ============ */
   #viewResult{ background:linear-gradient(180deg,#b79dfb,#c9b8ff); }
   .nav{
@@ -253,6 +266,27 @@
   .opt .l{ display:flex; align-items:center; gap:8px; }
   .opt .r{ color:var(--soft); font-size:13px; }
 
+  /* 发帖成功面板 */
+  .success-modal{
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.9);
+    width:86%; max-width:340px; background:#fff; border-radius:22px; z-index:40;
+    padding:26px 22px 20px; text-align:center; opacity:0; visibility:hidden; transition:.25s;
+  }
+  .success-modal.show{ opacity:1; visibility:visible; transform:translate(-50%,-50%) scale(1); }
+  .sm-emoji{ font-size:48px; }
+  .sm-title{ font-size:20px; font-weight:900; color:var(--ink); margin-top:6px; }
+  .sm-sub{ font-size:13px; color:var(--soft); margin-top:6px; }
+  .sm-loop{ margin:20px 0 14px; padding:14px 10px; background:#f7f5fd; border-radius:16px; }
+  .sm-loop-t{ font-size:13px; font-weight:800; color:var(--ink); margin-bottom:14px; }
+  .sm-tools{ display:flex; justify-content:space-between; }
+  .sm-tool{ flex:1; cursor:pointer; }
+  .sm-tool:active{ transform:scale(.92); }
+  .sm-ic{ width:46px; height:46px; margin:0 auto 6px; border-radius:14px; display:grid;
+    place-items:center; font-size:24px; color:#fff; }
+  .sm-tool span{ font-size:11px; color:var(--ink); }
+  .sm-secondary{ width:100%; padding:13px; border:none; background:transparent;
+    color:var(--soft); font-size:14px; font-weight:700; cursor:pointer; }
+
   /* toast */
   .toast{
     position:fixed; left:50%; top:42%; transform:translate(-50%,-50%) scale(.9);
@@ -266,8 +300,25 @@
 <body>
 <div class="phone">
 
+  <!-- ======= 视图0：工具测评入口 ======= -->
+  <section id="viewTest" class="view active">
+    <div class="nav">
+      <div class="back" onclick="toast('返回上一页')">‹</div>
+      <div class="title">十六人格测试</div>
+      <div style="width:32px"></div>
+    </div>
+    <div class="test-hero">
+      <div class="test-logo">🦊</div>
+      <h1 class="test-title">16 型人格测试</h1>
+      <p class="test-sub">发现真实的自己 · 已有 1.2 亿人参与</p>
+      <div class="test-meta">共 48 题 · 约 3 分钟</div>
+      <button class="test-start" onclick="startTest()">开始测评</button>
+      <div class="test-tip">测完生成你的专属人格海报 🎉</div>
+    </div>
+  </section>
+
   <!-- ======= 视图1：结果页 ======= -->
-  <section id="viewResult" class="view active">
+  <section id="viewResult" class="view">
     <div class="nav">
       <div class="back" onclick="toast('返回上一页')">‹</div>
       <div class="title">测测人格</div>
@@ -484,6 +535,24 @@
   </div>
 </div>
 
+<!-- ======= 发帖成功面板（闭环关键） ======= -->
+<div class="mask" id="successMask" onclick="closeSuccess()"></div>
+<div class="success-modal" id="successModal">
+  <div class="sm-emoji">🎉</div>
+  <div class="sm-title">发布成功</div>
+  <div class="sm-sub">你的人格帖子已发布到社区</div>
+  <div class="sm-loop">
+    <div class="sm-loop-t">🔄 继续玩：测一测别的</div>
+    <div class="sm-tools">
+      <div class="sm-tool" onclick="retest('16型人格')"><div class="sm-ic" style="background:linear-gradient(135deg,#8b6bff,#4aa6ff)">🦊</div><span>再测一次</span></div>
+      <div class="sm-tool" onclick="retest('MBTI 深度版')"><div class="sm-ic" style="background:linear-gradient(135deg,#ff6ba6,#ff9a52)">🧠</div><span>深度人格</span></div>
+      <div class="sm-tool" onclick="retest('恋爱人格')"><div class="sm-ic" style="background:linear-gradient(135deg,#ff8aa6,#ff5c8a)">💘</div><span>恋爱人格</span></div>
+      <div class="sm-tool" onclick="retest('职业性格')"><div class="sm-ic" style="background:linear-gradient(135deg,#4aa6ff,#42d392)">💼</div><span>职业性格</span></div>
+    </div>
+  </div>
+  <button class="sm-secondary" onclick="viewMyPost()">查看我的帖子</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -618,10 +687,33 @@
   /* ---- 发布到社区 ---- */
   function goPublish(){ closeSheet(); showView('viewPublish'); updateCount(); }
   function publish(){
-    var title = document.getElementById('pubTitle').value.trim();
-    var body  = document.getElementById('pubBody').value.trim();
-    toast('发布成功 🎉' + (title? '：'+title : ''));
-    setTimeout(function(){ showView('viewResult'); }, 1200);
+    openSuccess();
+  }
+
+  /* ---- 测评入口：开始测评 → 生成海报 ---- */
+  function startTest(){
+    toast('测评中，生成你的人格海报…');
+    setTimeout(function(){ showView('viewResult'); }, 900);
+  }
+
+  /* ---- 发帖成功面板（闭环） ---- */
+  function openSuccess(){
+    document.getElementById('successMask').classList.add('show');
+    document.getElementById('successModal').classList.add('show');
+  }
+  function closeSuccess(){
+    document.getElementById('successMask').classList.remove('show');
+    document.getElementById('successModal').classList.remove('show');
+  }
+  function retest(name){          // 点工具 → 绕回测评，闭环
+    closeSuccess();
+    showView('viewTest');
+    toast('开始「'+name+'」测评');
+  }
+  function viewMyPost(){
+    closeSuccess();
+    showView('viewResult');
+    toast('已返回，帖子已发布 ✅');
   }
 
   /* ---- 分享到平台（原型：尝试系统分享，否则提示）---- */
